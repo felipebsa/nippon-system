@@ -3,6 +3,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy import select, or_
 from schemas.client import SchemaClientResponse, SchemaClientAddress, SchemaClientContact, SchemaClientCreate, SchemaClientUpdate, SchemaClientExpired
 from models.client import Client
+from models.vehicle import Vehicle
 from database import get_db 
 from routes.auth import get_current_user
 
@@ -60,6 +61,10 @@ def delete_client(id: int, db: Session = Depends(get_db), _=Depends(get_current_
     db_client = db.execute(query).scalars().first()
     if db_client is None:
         raise HTTPException(status_code=404, detail="not found")
+    vehicle_query = select(Vehicle).where(Vehicle.client_id==id)
+    db_vehicles = db.execute(vehicle_query).scalars().all()
+    for vehicle in db_vehicles:
+        vehicle.active = False
     db.delete(db_client)
     db.commit()
     return {"message": "successful delete_client"}
