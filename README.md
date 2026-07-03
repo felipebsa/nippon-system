@@ -104,17 +104,29 @@ Frontend: open `frontend/index.html` with Live Server on port **5500**
 ### Vehicles
 | Method | Route | Description |
 |--------|-------|-------------|
-| | | |
+| POST | `/vehicle/register` | Register a new vehicle linked to a client |
+| GET | `/vehicle/get/all` | List all vehicles |
+| GET | `/vehicle/get/id/{id}` | Get vehicle by ID |
+| GET | `/vehicle/get/active/{bool}` | List active or inactive vehicles |
+| PUT | `/vehicle/update/{id}` | Full update of a vehicle |
+| PATCH | `/vehicle/update/active/{id}` | Toggle vehicle active status |
+| DELETE | `/vehicle/delete/{id}` | Delete a vehicle |
 
 ### Services
 | Method | Route | Description |
 |--------|-------|-------------|
-| | | |
+| POST | `/service/register` | Register a new service linked to a client and vehicle |
+| GET | `/services/get/all` | List all services |
+| GET | `/service/get/{id}` | Get service by ID |
+| GET | `/services/get/{finish}` | List finished or pending services |
+| PUT | `/service/update/{id}` | Full update of a service |
+| PATCH | `/service/update/finish/{id}` | Toggle service finish status |
+| DELETE | `/service/delete/{id}` | Delete a service |
 
 ### Materials
 | Method | Route | Description |
 |--------|-------|-------------|
-| | | |
+| | | *Coming soon* |
 
 ---
 
@@ -144,17 +156,32 @@ Frontend: open `frontend/index.html` with Live Server on port **5500**
 ### Vehicle
 | Field | Type | Description |
 |-------|------|-------------|
-| | | |
+| vehicle_id | Integer | Primary key |
+| client_id | Integer | Foreign key → clients |
+| model | String | Vehicle model |
+| plate | String | Unique license plate |
+| kind | String (optional) | Vehicle type (car, motorcycle, etc.) |
+| active | Boolean | Whether the vehicle is active |
+| created | DateTime | Registration timestamp |
 
 ### Service
 | Field | Type | Description |
 |-------|------|-------------|
-| | | |
+| service_id | Integer | Primary key |
+| vehicle_id | Integer | Foreign key → vehicles |
+| client_id | Integer | Foreign key → clients |
+| title | String | Service title |
+| desc | String | Service description |
+| kind | String | Service type |
+| date_release | DateTime (optional) | Expected delivery date |
+| labor_value | Float (optional) | Labor cost |
+| finish | Boolean | Whether the service is completed |
+| created | DateTime | Registration timestamp |
 
 ### Material
 | Field | Type | Description |
 |-------|------|-------------|
-| | | |
+| | | *Coming soon* |
 
 ---
 
