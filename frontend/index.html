@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Nippon Detail — Estética Automotiva Premium</title>
+  <link rel="stylesheet" href="css/global.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css" />
+</head>
+<body>
+
+  <!-- NAVBAR PÚBLICA -->
+  <nav class="navbar">
+    <div class="navbar-spacer"></div>
+
+    <ul class="navbar-menu">
+      <li><a href="#home" class="active">Home</a></li>
+      <li><a href="#sobre">Sobre</a></li>
+      <li><a href="#servicos">Serviços</a></li>
+      <li><a href="#contato">Contato</a></li>
+    </ul>
+
+    <div class="navbar-auth" id="navbar-auth">
+      <button class="btn-auth" onclick="abrirModalLogin()">Entrar</button>
+      <button class="btn-auth solid" onclick="abrirModalCadastro()">Cadastrar</button>
+    </div>
+
+    <div class="navbar-user" id="navbar-user" onclick="irParaCentral()">
+      <i class="ti ti-user-circle"></i>
+      <span id="navbar-username">Admin</span>
+    </div>
+  </nav>
+
+  <!-- HERO / CARROSSEL -->
+  <section class="hero" id="home">
+    <img src="img/logo-flutuante.png" alt="Nippon Detail" class="hero-brand" />
+
+    <div class="hero-slides" id="hero-slides">
+      <div class="hero-slide active"><img src="img/carro-01.jpg" alt="Serviço Nippon Detail 1" /></div>
+      <div class="hero-slide"><img src="img/carro-02.jpg" alt="Serviço Nippon Detail 2" /></div>
+      <div class="hero-slide"><img src="img/carro-03.jpg" alt="Serviço Nippon Detail 3" /></div>
+      <div class="hero-slide"><img src="img/carro-04.jpg" alt="Serviço Nippon Detail 4" /></div>
+      <div class="hero-slide"><img src="img/carro-05.jpg" alt="Serviço Nippon Detail 5" /></div>
+      <div class="hero-slide"><img src="img/carro-06.jpg" alt="Serviço Nippon Detail 6" /></div>
+    </div>
+
+    <div class="hero-overlay"></div>
+
+    <button class="hero-arrow prev" onclick="carrosselAnterior()"><i class="ti ti-chevron-left"></i></button>
+    <button class="hero-arrow next" onclick="carrosselProximo()"><i class="ti ti-chevron-right"></i></button>
+
+    <div class="hero-content">
+      <h1>Proteção e brilho<br>inigualável para <span>seu veículo</span></h1>
+      <p>Proteção veicular, estética automotiva premium, PPF, vitrificação.</p>
+      <button class="hero-cta" onclick="document.getElementById('contato').scrollIntoView({behavior:'smooth'})">
+        Solicitar orçamento personalizado <i class="ti ti-arrow-right"></i>
+      </button>
+      <div class="hero-badges">
+        <div class="hero-badge"><span class="hero-badge-icon"><i class="ti ti-star-filled"></i></span> Reconhecimento 5 Estrelas no Google</div>
+        <div class="hero-badge"><span class="hero-badge-icon"><i class="ti ti-shield-check"></i></span> Garantia de Qualidade e Satisfação</div>
+      </div>
+    </div>
+
+    <div class="hero-dots" id="hero-dots"></div>
+  </section>
+
+  <!-- placeholder das próximas seções -->
+  <section id="sobre" style="min-height: 60vh; display:flex; align-items:center; justify-content:center; color: var(--text-secundario);">Seção Sobre (em construção)</section>
+  <section id="servicos" class="services-section">
+    <div class="services-header">
+      <span class="services-eyebrow">サービス · Serviços</span>
+      <h2>Nossos <span>Serviços</span></h2>
+    </div>
+
+    <div class="services-grid">
+
+      <div class="service-card">
+        <div class="service-icon"><i class="ti ti-droplet"></i></div>
+        <div class="service-info">
+          <h3>Lavagem Simples</h3>
+          <p>Lavagem externa completa. Remoção de sujeiras leves.</p>
+        </div>
+        <div class="service-price"><span>A partir de</span>R$ 60,00</div>
+      </div>
+
+      <div class="service-card">
+        <div class="service-icon"><i class="ti ti-car-suv"></i></div>
+        <div class="service-info">
+          <h3>Lavagem Detalhada</h3>
+          <p>Lavagem completa com produtos premium, limpeza de rodas e pneus.</p>
+        </div>
+        <div class="service-price"><span>A partir de</span>R$ 150,00</div>
+      </div>
+
+      <div class="service-card">
+        <div class="service-icon"><i class="ti ti-brush"></i></div>
+        <div class="service-info">
+          <h3>Polimento Técnico</h3>
+          <p>Correção de verniz, remoção de riscos e marcas de uso.</p>
+        </div>
+        <div class="service-price"><span>A partir de</span>R$ 1.500,00</div>
+      </div>
+
+      <div class="service-card">
+        <div class="service-icon"><i class="ti ti-sparkles"></i></div>
+        <div class="service-info">
+          <h3>Polimento Comercial</h3>
+          <p>Polimento para realce de brilho e remoção de micro riscos.</p>
+        </div>
+        <div class="service-price"><span>A partir de</span>R$ 600,00</div>
+      </div>
+
+      <div class="service-card">
+        <div class="service-icon"><i class="ti ti-shield-check"></i></div>
+        <div class="service-info">
+          <h3>Vitrificação</h3>
+          <p>Proteção de pintura com alta durabilidade e efeito hidrofóbico.</p>
+        </div>
+        <div class="service-price"><span>A partir de</span>R$ 800,00</div>
+      </div>
+
+      <div class="service-card">
+        <div class="service-icon"><i class="ti ti-armchair-2"></i></div>
+        <div class="service-info">
+          <h3>Higienização Interna</h3>
+          <p>Limpeza completa de bancos, carpetes, forro de teto e painéis.</p>
+        </div>
+        <div class="service-price"><span>A partir de</span>R$ 200,00</div>
+      </div>
+
+      <div class="service-card">
+        <div class="service-icon"><i class="ti ti-bulb"></i></div>
+        <div class="service-info">
+          <h3>Revitalização de Faróis</h3>
+          <p>Restauração da transparência e brilho dos faróis.</p>
+        </div>
+        <div class="service-price"><span>A partir de</span>R$ 150,00</div>
+      </div>
+
+      <div class="service-card">
+        <div class="service-icon"><i class="ti ti-engine"></i></div>
+        <div class="service-info">
+          <h3>Lavagem de Motor</h3>
+          <p>Limpeza completa do motor com produtos específicos.</p>
+        </div>
+        <div class="service-price"><span>A partir de</span>R$ 150,00</div>
+      </div>
+
+      <div class="service-card">
+        <div class="service-icon"><i class="ti ti-window"></i></div>
+        <div class="service-info">
+          <h3>Insulfilm</h3>
+          <p>Películas automotivas de alta qualidade, proteção e privacidade.</p>
+        </div>
+        <div class="service-price consulte">Consulte valores</div>
+      </div>
+
+      <div class="service-card">
+        <div class="service-icon"><i class="ti ti-car"></i></div>
+        <div class="service-info">
+          <h3>Customizações</h3>
+          <p>Películas, envelopamentos, blackout, detalhes e muito mais.</p>
+        </div>
+        <div class="service-price consulte">Consulte valores</div>
+      </div>
+
+    </div>
+
+    <div class="services-footer">
+      <i class="ti ti-calendar-event"></i> Atendimento com hora marcada — buscamos e levamos o carro
+    </div>
+  </section>
+  <section id="contato" style="min-height: 60vh; display:flex; align-items:center; justify-content:center; color: var(--text-secundario);">Seção Contato (em construção)</section>
+
+  <!-- MODAL LOGIN -->
+  <div class="modal-overlay" id="modal-login">
+    <div class="modal">
+      <div class="modal-header">
+        <span class="modal-title">Entrar <span>·</span> Nippon Detail</span>
+        <button class="modal-close" onclick="fecharModalLogin()"><i class="ti ti-x"></i></button>
+      </div>
+      <div class="modal-body">
+        <div class="modal-error" id="login-error"></div>
+        <div class="form-group">
+          <label class="form-label">Usuário</label>
+          <input class="form-input" type="text" id="login-username" placeholder="Seu usuário" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Senha</label>
+          <input class="form-input" type="password" id="login-password" placeholder="Sua senha" />
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-red" style="justify-content:center;" onclick="fazerLogin()"><i class="ti ti-login"></i> Entrar</button>
+        <div class="modal-switch">Ainda não tem conta? <a onclick="abrirModalCadastro()">Cadastre-se</a></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL CADASTRO -->
+  <div class="modal-overlay" id="modal-cadastro">
+    <div class="modal">
+      <div class="modal-header">
+        <span class="modal-title">Cadastrar <span>·</span> Nippon Detail</span>
+        <button class="modal-close" onclick="fecharModalCadastro()"><i class="ti ti-x"></i></button>
+      </div>
+      <div class="modal-body">
+        <div class="modal-error" id="cadastro-error"></div>
+        <div class="form-group">
+          <label class="form-label">Usuário</label>
+          <input class="form-input" type="text" id="cadastro-username" placeholder="Escolha um usuário" />
+          <span class="form-hint">Mínimo de 5 caracteres</span>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Senha</label>
+          <input class="form-input" type="password" id="cadastro-password" placeholder="Crie uma senha" />
+          <span class="form-hint">Mínimo de 8 caracteres</span>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Tipo de usuário</label>
+          <select class="form-select" id="cadastro-role">
+            <option value="admin">Admin</option>
+            <option value="user">User</option>
+          </select>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-red" style="justify-content:center;" onclick="fazerCadastro()"><i class="ti ti-user-plus"></i> Criar conta</button>
+        <div class="modal-switch">Já tem conta? <a onclick="abrirModalLogin()">Entrar</a></div>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/script.js"></script>
+</body>
+</html>
