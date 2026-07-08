@@ -34,7 +34,7 @@ def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(
 
 @router.get("/auth/debug")
 def get_debug(c_user = Depends(get_current_user)):
-    return {"username": c_user.username, "role": c_user.role}
+    return {"username": c_user.username}
 
 @router.get("/")
 def auth_home():
@@ -49,8 +49,7 @@ def create_user(user: SchemaRegister, db: Session = Depends(get_db)):
     hash_created = pwd_context.hash(user.password)
     post_user = User(
         username = user.username,
-        pass_hash = hash_created,
-        role = user.role
+        pass_hash = hash_created
     )
     db.add(post_user)
     db.commit()
@@ -68,7 +67,6 @@ def acess_user(user: OAuth2PasswordRequestForm = Depends(), db: Session = Depend
     payload = {
         "user_id": db_user.user_id,
         "username": db_user.username,
-        "role": db_user.role,
         "exp": datetime.now(timezone.utc) + timedelta(days=30)
     }
     token = jwt.encode(payload, SECRET_KEY, ALGORITHM)
