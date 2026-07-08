@@ -24,10 +24,17 @@
 }
 
 .sidebar-logo {
+  display: block;
   position: relative;
   height: 140px;
   border-bottom: 1px solid var(--borda);
   overflow: visible;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.sidebar-logo:hover {
+  opacity: 0.85;
 }
 
 .sidebar-logo img {

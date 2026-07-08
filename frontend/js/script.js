@@ -72,7 +72,6 @@ if (dotsContainer) {
 // MODAIS — LOGIN / CADASTRO
 // =====================================================
 function abrirModalLogin() {
-  document.getElementById("modal-cadastro").classList.remove("show");
   document.getElementById("modal-login").classList.add("show");
   limparErros();
 }
@@ -81,19 +80,8 @@ function fecharModalLogin() {
   document.getElementById("modal-login").classList.remove("show");
 }
 
-function abrirModalCadastro() {
-  document.getElementById("modal-login").classList.remove("show");
-  document.getElementById("modal-cadastro").classList.add("show");
-  limparErros();
-}
-
-function fecharModalCadastro() {
-  document.getElementById("modal-cadastro").classList.remove("show");
-}
-
 function limparErros() {
   document.getElementById("login-error").classList.remove("show");
-  document.getElementById("cadastro-error").classList.remove("show");
 }
 
 function mostrarErro(elId, mensagem) {
@@ -207,8 +195,7 @@ document.querySelectorAll(".modal-overlay").forEach((overlay) => {
 // =====================================================
 // AUTENTICAÇÃO
 // =====================================================
-// lógica de login extraída pra ser reutilizada tanto pelo botão "Entrar"
-// quanto automaticamente logo depois de um cadastro bem-sucedido
+// lógica de login extraída em função própria pra ficar fácil de reutilizar se precisar
 async function realizarLogin(username, password, elIdErro) {
   const corpo = new URLSearchParams();
   corpo.append("username", username);
@@ -221,7 +208,7 @@ async function realizarLogin(username, password, elIdErro) {
   });
 
   if (!resp.ok) {
-    mostrarErro(elIdErro, "Conta criada, mas não foi possível entrar automaticamente. Tente fazer login manualmente.");
+    mostrarErro(elIdErro, "Usuário ou senha incorretos.");
     return false;
   }
 
@@ -248,49 +235,6 @@ async function fazerLogin() {
     irParaCentral();
   } catch (err) {
     mostrarErro("login-error", "Não foi possível conectar ao servidor.");
-  }
-}
-
-async function fazerCadastro() {
-  const username = document.getElementById("cadastro-username").value.trim();
-  const password = document.getElementById("cadastro-password").value;
-  const role = document.getElementById("cadastro-role").value;
-
-  if (!username || !password) {
-    mostrarErro("cadastro-error", "Preencha usuário e senha.");
-    return;
-  }
-
-  if (username.length < 5) {
-    mostrarErro("cadastro-error", "O usuário precisa ter no mínimo 5 caracteres.");
-    return;
-  }
-
-  if (password.length < 8) {
-    mostrarErro("cadastro-error", "A senha precisa ter no mínimo 8 caracteres.");
-    return;
-  }
-
-  try {
-    const resp = await fetch(`${API_URL}/auth/register`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ username, password, role }),
-    });
-
-    if (!resp.ok) {
-      mostrarErro("cadastro-error", "Não foi possível criar a conta. Usuário já existe?");
-      return;
-    }
-
-    // cadastro OK -> loga automaticamente com as mesmas credenciais, sem pedir de novo
-    const sucesso = await realizarLogin(username, password, "cadastro-error");
-    if (!sucesso) return;
-
-    fecharModalCadastro();
-    irParaCentral();
-  } catch (err) {
-    mostrarErro("cadastro-error", "Não foi possível conectar ao servidor.");
   }
 }
 

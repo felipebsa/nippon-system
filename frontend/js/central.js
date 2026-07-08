@@ -75,7 +75,8 @@ async function carregarClientesParaSelect() {
   try {
     const resp = await fetch(`${API_URL}/client/get/all`, { headers: authHeaders(false) });
     if (tratarRespostaAuth(resp)) return;
-    todosClientes = await resp.json();
+    const dados = await resp.json();
+    todosClientes = resp.ok ? (Array.isArray(dados) ? dados : dados.message || []) : [];
 
     const select = document.getElementById("v-client-id");
     select.innerHTML = '<option value="">Selecione um cliente</option>';
@@ -95,7 +96,14 @@ async function carregarVeiculos() {
   try {
     const resp = await fetch(`${API_URL}/vehicle/get/all`, { headers: authHeaders(false) });
     if (tratarRespostaAuth(resp)) return;
-    todosVeiculos = await resp.json();
+    const dados = await resp.json();
+
+    if (resp.ok) {
+      todosVeiculos = Array.isArray(dados) ? dados : dados.message || [];
+    } else {
+      todosVeiculos = [];
+    }
+
     renderizarVeiculos();
   } catch (err) {
     console.error("Erro ao carregar veículos:", err);
@@ -473,7 +481,14 @@ async function carregarClientes() {
   try {
     const resp = await fetch(`${API_URL}/client/get/all`, { headers: authHeaders(false) });
     if (tratarRespostaAuth(resp)) return;
-    todosClientesLista = await resp.json();
+    const dados = await resp.json();
+
+    if (resp.ok) {
+      todosClientesLista = Array.isArray(dados) ? dados : dados.message || [];
+    } else {
+      todosClientesLista = [];
+    }
+
     todosClientes = todosClientesLista; // mantém o select de veículos atualizado também
     renderizarClientes();
     atualizarStatsDashboard();
@@ -1014,7 +1029,8 @@ async function carregarVeiculosParaSelect() {
   try {
     const resp = await fetch(`${API_URL}/vehicle/get/all`, { headers: authHeaders(false) });
     if (tratarRespostaAuth(resp)) return;
-    const veiculos = await resp.json();
+    const dados = await resp.json();
+    const veiculos = resp.ok ? (Array.isArray(dados) ? dados : dados.message || []) : [];
     const select = document.getElementById("s-vehicle-id");
     select.innerHTML = '<option value="">Selecione um veículo</option>';
     veiculos.forEach((v) => {

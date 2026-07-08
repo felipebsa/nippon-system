@@ -35,8 +35,7 @@
       </button>
 
       <div class="navbar-auth" id="navbar-auth">
-        <button class="btn-auth" onclick="abrirModalLogin()">Entrar</button>
-        <button class="btn-auth solid" onclick="abrirModalCadastro()">Cadastrar</button>
+        <button class="btn-auth solid" onclick="abrirModalLogin()">Entrar</button>
       </div>
 
       <div class="navbar-user" id="navbar-user" onclick="irParaCentral()">
@@ -286,41 +285,6 @@
       </div>
       <div class="modal-footer">
         <button class="btn-red" style="justify-content:center;" onclick="fazerLogin()"><i class="ti ti-login"></i> Entrar</button>
-        <div class="modal-switch">Ainda não tem conta? <a onclick="abrirModalCadastro()">Cadastre-se</a></div>
-      </div>
-    </div>
-  </div>
-
-  <!-- MODAL CADASTRO -->
-  <div class="modal-overlay" id="modal-cadastro">
-    <div class="modal">
-      <div class="modal-header">
-        <span class="modal-title">Cadastrar <span>·</span> Nippon Detail</span>
-        <button class="modal-close" onclick="fecharModalCadastro()"><i class="ti ti-x"></i></button>
-      </div>
-      <div class="modal-body">
-        <div class="modal-error" id="cadastro-error"></div>
-        <div class="form-group">
-          <label class="form-label">Usuário</label>
-          <input class="form-input" type="text" id="cadastro-username" placeholder="Escolha um usuário" />
-          <span class="form-hint">Mínimo de 5 caracteres</span>
-        </div>
-        <div class="form-group">
-          <label class="form-label">Senha</label>
-          <input class="form-input" type="password" id="cadastro-password" placeholder="Crie uma senha" />
-          <span class="form-hint">Mínimo de 8 caracteres</span>
-        </div>
-        <div class="form-group">
-          <label class="form-label">Tipo de usuário</label>
-          <select class="form-select" id="cadastro-role">
-            <option value="admin">Admin</option>
-            <option value="user">User</option>
-          </select>
-        </div>
-      </div>
-      <div class="modal-footer">
-        <button class="btn-red" style="justify-content:center;" onclick="fazerCadastro()"><i class="ti ti-user-plus"></i> Criar conta</button>
-        <div class="modal-switch">Já tem conta? <a onclick="abrirModalLogin()">Entrar</a></div>
       </div>
     </div>
   </div>
