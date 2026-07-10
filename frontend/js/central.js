@@ -715,6 +715,12 @@ let todosMateriais = [];
 let modoMaterial = "none";
 let filtroDisponivelMaterial = "todos"; // todos | disponiveis | indisponiveis
 
+let todosDespesas = [];
+let modoDespesa = "none";
+let finMesRef = new Date().getMonth(); // 0-11
+let finAnoRef = new Date().getFullYear();
+let graficoFinanceiro = null;
+
 async function carregarMateriais() {
   try {
     const resp = await fetch(`${API_URL}/material/get/all`, { headers: authHeaders(false) });
@@ -1356,6 +1362,7 @@ async function carregarTudo() {
   await carregarVeiculos();
   await carregarServicos();
   await carregarMateriais();
+  await carregarDespesas();
   esconderLoadingInicial();
 }
 
@@ -1603,9 +1610,340 @@ function esconderTooltipCal() {
 
 carregarTudo();
 inicializarCalendario();
+inicializarFinanceiro();
+// =====================================================
+// FINANCEIRO
+// =====================================================
+
+// busca as despesas na API — sempre garante array, mesmo com lista vazia (404)
+async function carregarDespesas() {
+  try {
+    const resp = await fetch(`${API_URL}/expense/get/all`, { headers: authHeaders(false) });
+    if (tratarRespostaAuth(resp)) return;
+    const dados = await resp.json();
+    todosDespesas = resp.ok ? (Array.isArray(dados) ? dados : dados.message || []) : [];
+    renderizarDespesas();
+    renderizarFinanceiro();
+  } catch (err) {
+    console.error("Erro ao carregar despesas:", err);
+  }
+}
+
+function formatarMoeda(v) {
+  return Number(v || 0).toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+}
+
+// pega a data "efetiva" de receita de um serviço concluído — usa date_release,
+// e cai pra created se não tiver (decisão que já tomamos juntos)
+function dataEfetivaServico(s) {
+  return (s.date_release || s.created).substring(0, 10);
+}
+
+function chaveMes(dataStr) {
+  return dataStr.substring(0, 7); // "YYYY-MM"
+}
+
+// soma o valor dos serviços concluídos, agrupado por mês
+function agruparReceitaPorMes() {
+  const grupos = {};
+  todosServicos
+    .filter((s) => s.finish)
+    .forEach((s) => {
+      const chave = chaveMes(dataEfetivaServico(s));
+      grupos[chave] = (grupos[chave] || 0) + Number(s.value);
+    });
+  return grupos;
+}
+
+// soma o valor das despesas, agrupado por mês
+function agruparDespesaPorMes() {
+  const grupos = {};
+  todosDespesas.forEach((d) => {
+    const chave = chaveMes(d.date);
+    grupos[chave] = (grupos[chave] || 0) + Number(d.value);
+  });
+  return grupos;
+}
+
+// devolve os últimos N meses terminando em ano/mes (incluindo ele), do mais antigo pro mais novo
+function ultimosNMeses(ano, mes, n) {
+  const meses = [];
+  for (let i = n - 1; i >= 0; i--) {
+    const d = new Date(ano, mes - i, 1);
+    const chave = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
+    meses.push({ chave, label: `${NOMES_MESES_ABREV[d.getMonth()]}/${String(d.getFullYear()).slice(2)}` });
+  }
+  return meses;
+}
+
+// lê uma variável CSS do tema atual — assim o gráfico usa as cores certas no claro e no escuro
+function corVar(nome) {
+  return getComputedStyle(document.body).getPropertyValue(nome).trim();
+}
+
+function inicializarFinanceiro() {
+  const selMes = document.getElementById("fin-select-mes");
+  const selAno = document.getElementById("fin-select-ano");
+  if (!selMes || !selAno) return;
+
+  selMes.innerHTML = NOMES_MESES.map((nome, i) => `<option value="${i}">${nome}</option>`).join("");
+  const anoBase = new Date().getFullYear();
+  let opcoesAno = "";
+  for (let y = anoBase - 3; y <= anoBase + 1; y++) {
+    opcoesAno += `<option value="${y}">${y}</option>`;
+  }
+  selAno.innerHTML = opcoesAno;
+  selMes.value = finMesRef;
+  selAno.value = finAnoRef;
+}
+
+function finAtualizarMesReferencia() {
+  finMesRef = Number(document.getElementById("fin-select-mes").value);
+  finAnoRef = Number(document.getElementById("fin-select-ano").value);
+  renderizarFinanceiro();
+}
+
+function renderizarFinanceiro() {
+  if (!document.getElementById("fin-stat-receita")) return; // view só existe no central.html
+  renderizarStatsFinanceiro();
+  renderizarGraficoFinanceiro();
+  renderizarRankings();
+}
+
+function renderizarStatsFinanceiro() {
+  const receitas = agruparReceitaPorMes();
+  const despesas = agruparDespesaPorMes();
+  const chave = `${finAnoRef}-${String(finMesRef + 1).padStart(2, "0")}`;
+
+  const receitaMes = receitas[chave] || 0;
+  const despesaMes = despesas[chave] || 0;
+  const lucroMes = receitaMes - despesaMes;
+
+  document.getElementById("fin-stat-receita").textContent = formatarMoeda(receitaMes);
+  document.getElementById("fin-stat-despesa").textContent = formatarMoeda(despesaMes);
+
+  const lucroEl = document.getElementById("fin-stat-lucro");
+  lucroEl.textContent = formatarMoeda(lucroMes);
+  lucroEl.classList.toggle("red", lucroMes < 0);
+}
+
+function renderizarGraficoFinanceiro() {
+  const canvas = document.getElementById("fin-grafico");
+  if (!canvas || typeof Chart === "undefined") return;
+
+  const receitas = agruparReceitaPorMes();
+  const despesas = agruparDespesaPorMes();
+  const meses = ultimosNMeses(finAnoRef, finMesRef, 6);
+
+  const labels = meses.map((m) => m.label);
+  const dadosReceita = meses.map((m) => receitas[m.chave] || 0);
+  const dadosDespesa = meses.map((m) => despesas[m.chave] || 0);
+
+  if (graficoFinanceiro) graficoFinanceiro.destroy();
+
+  const corTexto = corVar("--text-secundario");
+  const corGrade = corVar("--borda");
+
+  graficoFinanceiro = new Chart(canvas, {
+    type: "bar",
+    data: {
+      labels,
+      datasets: [
+        { label: "Receita", data: dadosReceita, backgroundColor: corVar("--verde-ok") },
+        { label: "Despesa", data: dadosDespesa, backgroundColor: corVar("--vermelho") },
+      ],
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { labels: { color: corTexto } },
+      },
+      scales: {
+        x: { ticks: { color: corTexto }, grid: { color: corGrade } },
+        y: { ticks: { color: corTexto }, grid: { color: corGrade } },
+      },
+    },
+  });
+}
+
+function rankingPorSoma(itens, chaveAgrupar, limite = 5) {
+  const somas = {};
+  itens.forEach((item) => {
+    const chave = item[chaveAgrupar];
+    somas[chave] = (somas[chave] || 0) + Number(item.value);
+  });
+  return Object.entries(somas)
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, limite);
+}
+
+function moldeRanking(lista, elId, mensagemVazio) {
+  const el = document.getElementById(elId);
+  if (!lista.length) {
+    el.innerHTML = `<p class="view-placeholder">${mensagemVazio}</p>`;
+    return;
+  }
+  el.innerHTML = lista
+    .map(
+      ([nome, valor], i) => `
+      <div class="fin-rank-item">
+        <span class="fin-rank-pos">${i + 1}</span>
+        <span class="fin-rank-nome">${nome}</span>
+        <span class="fin-rank-valor">${formatarMoeda(valor)}</span>
+      </div>`
+    )
+    .join("");
+}
+
+function renderizarRankings() {
+  const rankingDespesas = rankingPorSoma(todosDespesas, "name");
+  const rankingServicos = rankingPorSoma(
+    todosServicos.filter((s) => s.finish),
+    "title"
+  );
+
+  moldeRanking(rankingDespesas, "fin-ranking-despesas", "Nenhuma despesa cadastrada ainda.");
+  moldeRanking(rankingServicos, "fin-ranking-servicos", "Nenhum serviço concluído ainda.");
+}
+
+// --- CRUD de despesas (mesmo padrão de cards do Material) ---
+
+function moldeCardDespesa(d) {
+  const badge =
+    d.origin === "automatica"
+      ? '<span class="badge badge-inativo">Automática</span>'
+      : '<span class="badge badge-ativo">Manual</span>';
+  const dataFmt = new Date(d.date).toLocaleDateString("pt-BR");
+  return `
+    <div class="item-card" data-id="${d.expense_id}" onclick="cliqueCardDespesa(${d.expense_id})">
+      <div class="item-card-icon"><i class="ti ti-receipt-2"></i></div>
+      <h4>${d.name}</h4>
+      <p>${formatarMoeda(d.value)}</p>
+      <p>${dataFmt}</p>
+      <div class="item-card-footer">${badge}</div>
+    </div>
+  `;
+}
+
+function renderizarDespesas() {
+  const grid = document.getElementById("despesas-grid");
+  if (!grid) return; // view só existe no central.html
+
+  const lista = [...todosDespesas].sort((a, b) => new Date(b.date) - new Date(a.date));
+  const htmlCards = lista.map(moldeCardDespesa).join("");
+  const cardNovo = `
+    <div class="item-card add-new" onclick="abrirModalDespesa()">
+      <i class="ti ti-plus"></i>
+      <span>Nova despesa</span>
+    </div>
+  `;
+  grid.innerHTML = cardNovo + htmlCards;
+  aplicarClasseModoGenerico("despesas-grid", modoDespesa);
+}
+
+function setModoDespesa(modo) {
+  modoDespesa = modo;
+  document.getElementById("fin-btn-edit").classList.remove("active-edit");
+  document.getElementById("fin-btn-del").classList.remove("active-del");
+  const warningBar = document.getElementById("fin-warning-bar");
+  warningBar.classList.remove("show", "del");
+
+  if (modo === "edit") {
+    document.getElementById("fin-btn-edit").classList.add("active-edit");
+    warningBar.classList.add("show");
+    document.getElementById("fin-warning-text").textContent = "Modo edição ativo — clique numa despesa para editá-la.";
+  } else if (modo === "del") {
+    document.getElementById("fin-btn-del").classList.add("active-del");
+    warningBar.classList.add("show", "del");
+    document.getElementById("fin-warning-text").textContent = "Modo apagar ativo — clique numa despesa para excluí-la.";
+  }
+  aplicarClasseModoGenerico("despesas-grid", modoDespesa);
+}
+
+function cliqueCardDespesa(id) {
+  if (modoDespesa === "edit") {
+    abrirModalEditarDespesa(id);
+  } else if (modoDespesa === "del") {
+    const despesa = todosDespesas.find((d) => d.expense_id === id);
+    pedirConfirmacao(`Apagar "${despesa.name}"?`, () => apagarDespesa(id));
+  }
+}
+
+function abrirModalDespesa() {
+  document.getElementById("despesa-modal-titulo").textContent = "Nova despesa";
+  document.getElementById("d-error").classList.remove("show");
+  document.getElementById("d-id").value = "";
+  document.getElementById("d-name").value = "";
+  document.getElementById("d-value").value = "";
+  document.getElementById("d-date").value = new Date().toISOString().substring(0, 10);
+  abrirModal("modal-despesa");
+}
+
+function abrirModalEditarDespesa(id) {
+  const d = todosDespesas.find((d) => d.expense_id === id);
+  if (!d) return;
+  document.getElementById("despesa-modal-titulo").textContent = "Editar despesa";
+  document.getElementById("d-error").classList.remove("show");
+  document.getElementById("d-id").value = d.expense_id;
+  document.getElementById("d-name").value = d.name;
+  document.getElementById("d-value").value = d.value;
+  document.getElementById("d-date").value = d.date.substring(0, 10);
+  abrirModal("modal-despesa");
+}
+
+async function salvarDespesa() {
+  const id = document.getElementById("d-id").value;
+  const name = document.getElementById("d-name").value.trim();
+  const value = Number(document.getElementById("d-value").value);
+  const date = document.getElementById("d-date").value;
+
+  if (!name || !document.getElementById("d-value").value || !date) {
+    mostrarErroEm("d-error", "Preencha nome, valor e data.");
+    return;
+  }
+
+  const payload = { name, value, date };
+  const editando = !!id;
+  const url = editando ? `${API_URL}/expense/update/${id}` : `${API_URL}/expense/register`;
+  const method = editando ? "PUT" : "POST";
+
+  const textoOriginal = travarBotaoSalvar("btn-salvar-despesa");
+  try {
+    const resp = await fetch(url, { method, headers: authHeaders(), body: JSON.stringify(payload) });
+    if (tratarRespostaAuth(resp)) return;
+    if (!resp.ok) {
+      await mostrarErroApiEm("d-error", resp, "Não foi possível salvar a despesa.");
+      return;
+    }
+    fecharModal("modal-despesa");
+    setModoDespesa("none");
+    carregarDespesas();
+  } catch (err) {
+    mostrarErroEm("d-error", "Não foi possível conectar ao servidor.");
+  } finally {
+    destravarBotaoSalvar("btn-salvar-despesa", textoOriginal);
+  }
+}
+
+async function apagarDespesa(id) {
+  try {
+    const resp = await fetch(`${API_URL}/expense/delete/${id}`, { method: "DELETE", headers: authHeaders(false) });
+    if (tratarRespostaAuth(resp)) return;
+    if (!resp.ok) {
+      alert("Não foi possível apagar a despesa.");
+      return;
+    }
+    carregarDespesas();
+  } catch (err) {
+    console.error("Erro ao apagar despesa:", err);
+  }
+}
+
 const titulosPorView = {
   dashboard: "Central",
   calendario: "Calendário",
+  financeiro: "Financeiro",
   clientes: "Clientes",
   veiculos: "Veículos",
   servicos: "Serviços",
