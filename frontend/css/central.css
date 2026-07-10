@@ -78,6 +78,13 @@
   color: var(--vermelho);
 }
 
+.sidebar-divider {
+  height: 1px;
+  background: var(--borda);
+  margin: 14px 6px 20px;
+  flex-shrink: 0;
+}
+
 .nav-item i {
   font-size: 21px;
 }
