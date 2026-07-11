@@ -173,9 +173,9 @@ body.light-mode .navbar {
 
 .hero-brand {
   position: fixed;
-  top: -100px;
-  left: -28px;
-  width: 380px;
+  top: 9px;
+  left: 54px;
+  width: 216px;
   height: auto;
   z-index: 250; /* maior que o z-index da navbar (200), fica por cima dela */
   pointer-events: none;
@@ -1104,18 +1104,66 @@ body.light-mode .navbar {
 @media (max-width: 900px) {
   .navbar-menu { display: none; }
   .menu-hamburguer { display: flex; }
-  .navbar { padding: 0 20px; }
-  .hero-arrow { width: 38px; height: 38px; font-size: 16px; }
-  .hero-arrow.prev { left: 10px; }
-  .hero-arrow.next { right: 10px; }
-  .hero-brand { width: 150px; left: 16px; top: -4px; }
+  .navbar { padding: 0 16px; }
+
+  /* logo flutuante: no mobile ela fica contida dentro da navbar,
+     centralizada verticalmente, sem cruzar a borda de baixo */
+  .hero-brand {
+    top: 21px;
+    left: 16px;
+    width: 60px;
+  }
+
+  /* hero mais curto no celular — usa dvh (altura visível real, sem contar
+     a barra do navegador) pra não cortar a foto de forma exagerada */
+  .hero {
+    height: 100svh;
+    min-height: 560px;
+  }
+
+  /* mostra mais do carro (menos "chão"/capô cortado) e desliga o zoom
+     ken-burns, que em telas estreitas exagera o corte da foto */
+  .hero-slide img {
+    object-position: center 38%;
+  }
+
+  .hero-slide.active img {
+    animation: none;
+  }
+
+  /* setas do carrossel removidas no celular — navegação fica pelas bolinhas */
+  .hero-arrow { display: none; }
+
   .about-grid { grid-template-columns: 1fr; }
   .about-stats { flex-direction: row; }
+
+  .services-section,
+  .about-section,
+  .contact-section {
+    padding: 64px 20px;
+  }
+
+  .services-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .contact-grid {
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  }
+}
+
+@media (max-width: 600px) {
+  .form-row {
+    grid-template-columns: 1fr;
+  }
 }
 
 @media (max-width: 480px) {
   .navbar-auth .btn-auth span.txt-full { display: none; }
   .hero-badges { gap: 14px; }
+  .about-stats { flex-direction: column; }
+  .hero-content { padding: 0 16px; }
+  .hero-cta { padding: 14px 22px; font-size: 13px; }
 }
 
 /* ===========================
