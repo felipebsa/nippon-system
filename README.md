@@ -2,7 +2,7 @@
 
 A management system built for an automotive detailing business, covering client and vehicle management, service tracking, inventory control, financial overview, and a public-facing site with an instant-quote form.
 
-🔗 **Live:** [nippon-system.netlify.app](https://nippon-detail.netlify.app/index.html)
+🔗 **Live:** [nippon-detail.netlify.app](https://nippon-detail.netlify.app/index.html)
 
 ---
 
@@ -101,6 +101,8 @@ python -m uvicorn main:app --reload
 Access the API at: **http://localhost:8000**
 Interactive docs at: **http://localhost:8000/docs**
 Frontend: open `frontend/index.html` with Live Server on port **5500** (remember to point `API_URL` in `js/script.js` and `js/central.js` back to `http://localhost:8000` when testing locally)
+
+> **Note:** in this repository, `index.html` and `central.html` live directly inside `frontend/` (matching what's deployed to Netlify). If you move them into a subfolder (e.g. `frontend/templates/`) for local testing, update the relative paths to `css/`, `js/`, and `img/` in both files accordingly (they'd need an extra `../`).
 
 The database schema is created automatically on first run via SQLAlchemy's `Base.metadata.create_all()` — no manual migration needed.
 
@@ -289,6 +291,6 @@ There is no public registration flow — the first (and, for now, only) account 
 
 ## Status
 
-**Live and feature-complete.** Client/vehicle/service/material management, delivery calendar, light/dark theme, a WhatsApp-based public quote form, and a full financial overview (manual + auto-generated expenses, revenue tracking, rankings) are all built, deployed, and working on PostgreSQL in production.
+✅ **Live and feature-complete.** Client/vehicle/service/material management, delivery calendar, light/dark theme, a WhatsApp-based public quote form, and a full financial overview (manual + auto-generated expenses, revenue tracking, rankings) are all built, deployed, and working on PostgreSQL in production.
 
-🚧 Next up: Docker and automated tests (pytest) — the remaining items from the original learning goals, not blockers for using the live app.
+📈 Next up: Docker and automated tests (pytest) — the remaining items from the original learning goals, not blockers for using the live app.
